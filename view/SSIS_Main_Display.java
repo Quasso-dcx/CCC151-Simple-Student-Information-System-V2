@@ -84,8 +84,7 @@ public class SSIS_Main_Display extends JFrame {
                     try {
                          // close the connection
                          Data_Manager.getConnection().close();
-                         new Login_Dialog("You want to Access again???").setVisible(true);
-                         SSIS_Main_Display.this.dispose();
+                         System.exit(0);
                     } catch (SQLException ex) {
                          // incase an error on closing the connection
                          JOptionPane.showMessageDialog(SSIS_Main_Display.this,
@@ -93,7 +92,6 @@ public class SSIS_Main_Display extends JFrame {
                                    "Connection Error", JOptionPane.ERROR_MESSAGE);
                     }
                }
-
           };
           this.addWindowListener(exitListener);
 
