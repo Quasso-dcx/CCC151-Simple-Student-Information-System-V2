@@ -18,7 +18,7 @@ public class Delete_Process {
     public Delete_Process(JTable table, JFrame main) {
         /*
          * If the table selected is the student table, else use the data from the course
-         * table
+         * table.
          */
         if (table.equals(Table_Manager.getStudentTable()))
             studentDelete(main);
@@ -57,13 +57,15 @@ public class Delete_Process {
             return;
 
         try {
-
-            PreparedStatement insert_statement = Data_Manager.getConnection()
+            // create the query for removing the student from the database
+            PreparedStatement delete_statement = Data_Manager.getConnection()
                     .prepareStatement("DELETE FROM students WHERE id_number = \"" + deleted_student_ID + "\"");
-            insert_statement.execute();
 
-            insert_statement.close();
+            // execute and close the query
+            delete_statement.execute();
+            delete_statement.close();
 
+            // remove the row from the table
             students_table_model.removeRow(table_row_selected);
 
             // for confirmation
@@ -91,11 +93,14 @@ public class Delete_Process {
             int table_row_selected = courses_table.getSelectedRow();
             String deleted_course_code = courses_table.getValueAt(table_row_selected, 0).toString();
 
-            PreparedStatement count_statement = Data_Manager.getConnection().prepareStatement(
+            // create the query
+            PreparedStatement count_query = Data_Manager.getConnection().prepareStatement(
                     "SELECT COUNT(course_code) FROM students WHERE course_code = \"" + deleted_course_code + "\";");
 
-            ResultSet rs = count_statement.executeQuery();
+            // execute the query
+            ResultSet rs = count_query.executeQuery();
             rs.next();
+
             // ask for confirmation
             int chosen = JOptionPane.showConfirmDialog(main,
                     "Currently enrolled: " + rs.getLong("COUNT(course_code)") + " \nDelete?", "Delete Confirmation",
@@ -105,22 +110,27 @@ public class Delete_Process {
             if (chosen != JOptionPane.OK_OPTION)
                 return;
 
-            count_statement.close();
+            // close the count query
+            count_query.close();
 
-            PreparedStatement insert_statement = Data_Manager.getConnection()
+            // create a query for removing the course form the database
+            PreparedStatement delete_statement = Data_Manager.getConnection()
                     .prepareStatement("DELETE FROM courses WHERE course_code = \"" + deleted_course_code + "\"");
-            insert_statement.execute();
 
+            // execute the query
+            delete_statement.execute();
+
+            // remove the row
             courses_table_model.removeRow(table_row_selected);
 
+            // update the course code of the students enrolled in the deleted course
             JTable students_table = Table_Manager.getStudentTable();
-            for (int row_count = 0; row_count < students_table.getRowCount(); row_count++) {
+            for (int row_count = 0; row_count < students_table.getRowCount(); row_count++)
                 if (students_table.getValueAt(row_count, students_table.getColumnCount() - 1)
                         .equals(deleted_course_code))
                     students_table.setValueAt("N/A", row_count, students_table.getColumnCount() - 1);
-            }
 
-            insert_statement.close();
+            delete_statement.close();
 
             // for confirmation
             JOptionPane.showConfirmDialog(main, "Course " + deleted_course_code + " removed.", "Course Deleted",
@@ -129,8 +139,6 @@ public class Delete_Process {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(main, "MySQL Error: " + e.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         }
-
     }
 }

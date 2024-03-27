@@ -6,6 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -20,7 +23,11 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
+import java.sql.SQLException;
+
 import control.Delete_Process;
+import control.Filter_Process;
+import model.Data_Manager;
 import model.Table_Manager;
 
 public class SSIS_Main_Display extends JFrame {
@@ -42,6 +49,9 @@ public class SSIS_Main_Display extends JFrame {
      private JTextField search_input;
      private JButton search_button;
 
+     // sorting data
+     private JButton sort_button;
+
      // functional buttons
      private JButton add_button;
      private JButton edit_button;
@@ -58,13 +68,36 @@ public class SSIS_Main_Display extends JFrame {
           // basic layouts for the frame display
           this.setTitle("Simple Student Information System (SSIS)");
           this.getContentPane().setPreferredSize(MAIN_DIMENSION);
-          this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+          this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
           this.setLayout(null);
           this.pack();
           this.setLocationRelativeTo(null);
           this.setResizable(false);
           this.setVisible(true);
 
+          /*
+           * Create a new login dialog incase the user wants to use this again.
+           */
+          WindowListener exitListener = new WindowAdapter() {
+               @Override
+               public void windowClosing(WindowEvent e) {
+                    try {
+                         // close the connection
+                         Data_Manager.getConnection().close();
+                         new Login_Dialog("You want to Access again???").setVisible(true);
+                         SSIS_Main_Display.this.dispose();
+                    } catch (SQLException ex) {
+                         // incase an error on closing the connection
+                         JOptionPane.showMessageDialog(SSIS_Main_Display.this,
+                                   "Failed to connect to the database.\nPlease check your username and password.",
+                                   "Connection Error", JOptionPane.ERROR_MESSAGE);
+                    }
+               }
+
+          };
+          this.addWindowListener(exitListener);
+
+          // setup the tables
           new Table_Manager(this);
           display_table = student_table = Table_Manager.getStudentTable();
           course_table = Table_Manager.getCourseTable();
@@ -154,11 +187,8 @@ public class SSIS_Main_Display extends JFrame {
           add_button.setBounds(PADDING_WIDTH * 2 + 120 * 1, PADDING_HEIGHT * 3, 120, 30);
           add_button.setFont(new Font("Times New Roman", Font.PLAIN, 18));
           add_button.setToolTipText("Add item to the table.");
-          add_button.addActionListener(new ActionListener() {
-               @Override
-               public void actionPerformed(ActionEvent e) {
-                    new Add_Dialog(display_table, SSIS_Main_Display.this).setVisible(true);
-               }
+          add_button.addActionListener(e -> {
+               new Add_Dialog(display_table, SSIS_Main_Display.this).setVisible(true);
           });
           option_panel.add(add_button);
 
@@ -175,9 +205,8 @@ public class SSIS_Main_Display extends JFrame {
                                    "Edit Data Error",
                                    JOptionPane.DEFAULT_OPTION);
                     // display the edit_dialog
-                    else {
-
-                    }
+                    else
+                         new Edit_Dialog(display_table, SSIS_Main_Display.this).setVisible(true);
                }
           });
           option_panel.add(edit_button);
@@ -194,9 +223,8 @@ public class SSIS_Main_Display extends JFrame {
                          JOptionPane.showMessageDialog(SSIS_Main_Display.this, "Please select a row.",
                                    "Delete Data Error",
                                    JOptionPane.DEFAULT_OPTION);
-                    else {
+                    else
                          new Delete_Process(display_table, SSIS_Main_Display.this); // facilitate the deletion process
-                    }
                }
           });
           option_panel.add(delete_button);
@@ -224,16 +252,13 @@ public class SSIS_Main_Display extends JFrame {
       */
      private void refreshFilterArea() {
           // get the columns of the displayed table
-          String[] columns = new String[1];
+          String[] columns = new String[display_table.getColumnCount() + 1];
           columns[0] = "Select Column...";
+          for (int column_count = 0; column_count < display_table.getColumnCount(); column_count++)
+               columns[column_count + 1] = display_table.getColumnName(column_count);
 
           column_names = new JComboBox<>(columns);
           column_names.setBounds(PADDING_WIDTH * 1, PADDING_HEIGHT * 3, 120, 30);
-          column_names.addActionListener(new ActionListener() {
-               @Override
-               public void actionPerformed(ActionEvent e) {
-               }
-          });
 
           // setup the search field
           search_input = new JTextField("Search Here");
@@ -242,16 +267,14 @@ public class SSIS_Main_Display extends JFrame {
                // This is to add a placeholder inside the textfield.
                @Override
                public void focusGained(FocusEvent e) {
-                    if (search_input.getText().equals("Search Here")) {
+                    if (search_input.getText().equals("Search Here"))
                          search_input.setText("");
-                    }
                }
 
                @Override
                public void focusLost(FocusEvent e) {
-                    if (search_input.getText().isEmpty()) {
+                    if (search_input.getText().isEmpty())
                          search_input.setText("Search Here");
-                    }
                }
           });
 
@@ -263,8 +286,25 @@ public class SSIS_Main_Display extends JFrame {
           search_button.addActionListener(new ActionListener() {
                @Override
                public void actionPerformed(ActionEvent e) {
-
+                    // secure that something is inputted to be search and a column is selected
+                    if (column_names.getSelectedItem().equals(column_names.getItemAt(0)))
+                         JOptionPane.showMessageDialog(SSIS_Main_Display.this, "Select a column.", "Invalid Column",
+                                   JOptionPane.CLOSED_OPTION);
+                    else if (search_input.getText().equals("") || search_input.getText().equals("Search Here"))
+                         JOptionPane.showMessageDialog(SSIS_Main_Display.this, "Enter something to search.",
+                                   "Empty Search",
+                                   JOptionPane.CLOSED_OPTION);
+                    else
+                         Filter_Process.regexFilter(display_table, search_input.getText().toString(),
+                                   column_names.getSelectedIndex() - 1);
                }
+          });
+
+          // button for sorting the tables
+          sort_button = new JButton("Sort Table");
+          sort_button.setBounds(PADDING_WIDTH * 1, PADDING_HEIGHT * 4 + 30, 120, 30);
+          sort_button.addActionListener(e -> {
+               new Sort_Dialog(sort_button, display_table.getName().toString()).setVisible(true);
           });
 
           filter_panel.removeAll();
@@ -274,6 +314,7 @@ public class SSIS_Main_Display extends JFrame {
           filter_panel.add(column_names);
           filter_panel.add(search_input);
           filter_panel.add(search_button);
+          filter_panel.add(sort_button);
      }
 
      /**

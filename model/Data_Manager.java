@@ -2,117 +2,127 @@ package model;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
+import control.Sort_Process;
+
+/**
+ * Facilitates the connection and data fetching/storing from the database.
+ */
 public class Data_Manager {
      private static Connection connect;
      private static DefaultTableModel courses_table_model;
      private static DefaultTableModel students_table_model;
      private static String[] course_column_names;
      private static String[] student_column_names;
+     private static boolean allow_access = false;
 
      public Data_Manager() {
-          createConnection("root", "rootPassword");
-          getCoursesData(connect);
-          getStudentsData(connect);
      }
 
+     /**
+      * Create a connection to the database.
+      * 
+      * @param username
+      * @param password
+      */
+     public static void createConnection(String username, String password) {
+          try {
+               connect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ssis_database", username, password);
+               getCoursesData(connect);
+               getStudentsData(connect);
+
+               Data_Manager.allow_access = true;
+          } catch (SQLException e) {
+               JOptionPane.showMessageDialog(null,
+                         "Failed to connect to the database.\nPlease check your username and password.",
+                         "Connection Error", JOptionPane.ERROR_MESSAGE);
+          }
+     }
+
+     /**
+      * Share the access. For the Login.
+      * 
+      * @return allow_access
+      */
+     public static boolean getAccess() {
+          return Data_Manager.allow_access;
+     }
+
+     /**
+      * Share the connection to the database.
+      * 
+      * @return
+      */
      public static Connection getConnection() {
           return Data_Manager.connect;
      }
 
-     /*
-      * Create a connection to the database.
+     /**
+      * Process the initial fetch of the student data from the database.
+      * 
+      * @param connect
       */
-     private void createConnection(String username, String password) {
-          try {
-               connect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ssis_database", username, password);
-          } catch (SQLException e) {
-               Logger.getLogger(Data_Manager.class.getName()).log(Level.SEVERE, null, e);
-          }
-     }
+     private static void getStudentsData(Connection connect) {
+          // get the column names
+          student_column_names = new String[] { "Last Name", "First Name", "Middle Name", "ID Number",
+                    "Year Level", "Gender", "Course Code" };
 
-     private void getStudentsData(Connection connect) {
-          try {
-               PreparedStatement get_students_statement = connect.prepareStatement(
-                         "SELECT * FROM students ORDER BY last_name ASC, first_name ASC, middle_name ASC;");
-               ResultSet rs = get_students_statement.executeQuery();
-
-               // get the column names
-               student_column_names = new String[] { "Last Name", "First Name", "Middle Name", "ID Number",
-                         "Year Level", "Gender", "Course Code" };
-
-               // setup the table model
-               students_table_model = new DefaultTableModel(0, 0) {
-                    // prevent editing directly in the cell table
-                    @Override
-                    public boolean isCellEditable(int row, int column) {
-                         return false;
-                    }
-               };
-               students_table_model.setColumnIdentifiers(student_column_names);
-               while (rs.next()) {
-                    String last_name = rs.getString("last_name");
-                    String first_name = rs.getString("first_name");
-                    String middle_name = rs.getString("middle_name");
-                    String id_number = rs.getString("id_number");
-                    String year_level = rs.getString("year_level");
-                    String gender = rs.getString("gender");
-                    String course_code;
-
-                    if (rs.getString("course_code") == null)
-                         course_code = "N/A";
-                    else
-                         course_code = rs.getString("course_code");
-
-                    students_table_model.addRow(new Object[] { last_name, first_name, middle_name, id_number,
-                              year_level, gender, course_code });
+          // setup the table model
+          students_table_model = new DefaultTableModel(0, 0) {
+               // prevent editing directly in the cell table
+               @Override
+               public boolean isCellEditable(int row, int column) {
+                    return false;
                }
-          } catch (SQLException e) {
-               Logger.getLogger(Data_Manager.class.getName()).log(Level.SEVERE, null, e);
-          }
+          };
+          students_table_model.setColumnIdentifiers(student_column_names);
+
+          // use sort to avoid code duplication for fetching data from the database
+          new Sort_Process("Students Table", 0, "ASC");
      }
 
+     /**
+      * Share the fetched data for the students.
+      * 
+      * @return students_table_model
+      */
      public static DefaultTableModel getStudentsModel() {
-          return students_table_model;
+          return Data_Manager.students_table_model;
      }
 
-     private void getCoursesData(Connection connect) {
-          try {
-               PreparedStatement get_students_statement = connect.prepareStatement("SELECT * FROM courses;");
-               ResultSet rs = get_students_statement.executeQuery();
+     /**
+      * Process the initial fetch of the courses data from the database.
+      * 
+      * @param connect
+      */
+     private static void getCoursesData(Connection connect) {
+          // get the column names
+          course_column_names = new String[] { "Course Code", "Course Name" };
 
-               // get the column names
-               course_column_names = new String[] { "Course Code", "Course Name" };
-
-               // setup the table and its model
-               courses_table_model = new DefaultTableModel(0, 0) {
-                    // prevent editing directly in the cell table
-                    @Override
-                    public boolean isCellEditable(int row, int column) {
-                         return false;
-                    }
-               };
-               courses_table_model.setColumnIdentifiers(course_column_names);
-
-               while (rs.next()) {
-                    String course_code = rs.getString("course_code");
-                    String course_name = rs.getString("course_name");
-
-                    courses_table_model.addRow(new Object[] { course_code, course_name });
+          // setup the table and its model
+          courses_table_model = new DefaultTableModel(0, 0) {
+               // prevent editing directly in the cell table
+               @Override
+               public boolean isCellEditable(int row, int column) {
+                    return false;
                }
-          } catch (SQLException e) {
-               Logger.getLogger(Data_Manager.class.getName()).log(Level.SEVERE, null, e);
-          }
+          };
+          courses_table_model.setColumnIdentifiers(course_column_names);
+
+          // use sort to avoid code duplication for fetching data from the database
+          new Sort_Process("Courses Table", 0, "ASC");
      }
 
+     /**
+      * Share the fetched data for the students.
+      * 
+      * @return courses_table_model
+      */
      public static DefaultTableModel getCoursesModel() {
-          return courses_table_model;
+          return Data_Manager.courses_table_model;
      }
 }

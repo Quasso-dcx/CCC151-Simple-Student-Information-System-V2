@@ -2,6 +2,9 @@ package model;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -20,7 +23,6 @@ public class Table_Manager {
     private JPopupMenu tablePopupMenu;
 
     public Table_Manager(JFrame main) {
-        new Data_Manager();
         processCourseTable(main);
         processStudentTable(main);
     }
@@ -31,18 +33,17 @@ public class Table_Manager {
     private void processStudentTable(JFrame main) {
         // setup the table
         students_table = new JTable(Data_Manager.getStudentsModel());
+        students_table.setName("Students Table");
         students_table.getTableHeader().setReorderingAllowed(false); // to make columns not movable
         students_table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // to prevent multiple selection
         tablePopupMenu = new JPopupMenu();
 
+        // count the number of students listed
         JMenuItem count = new JMenuItem("Student Count");
-        count.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(main,
-                        "There are currently " + students_table.getRowCount() + " student listed.", "Student count",
-                        JOptionPane.CLOSED_OPTION);
-            }
+        count.addActionListener(e -> {
+            JOptionPane.showMessageDialog(main,
+                    "There are currently " + students_table.getRowCount() + " student listed.", "Student count",
+                    JOptionPane.CLOSED_OPTION);
         });
         tablePopupMenu.add(count);
         students_table.setComponentPopupMenu(tablePopupMenu);
@@ -54,35 +55,19 @@ public class Table_Manager {
     private void processCourseTable(JFrame main) {
         // setup the table
         courses_table = new JTable(Data_Manager.getCoursesModel());
+        courses_table.setName("Courses Table");
         courses_table.getTableHeader().setReorderingAllowed(false); // to make columns not movable
         courses_table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // to prevent multiple selection
         tablePopupMenu = new JPopupMenu();
 
         // show how many course listed
         JMenuItem count = new JMenuItem("Course Count");
-        count.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(main,
-                        "There are currently " + courses_table.getRowCount() + " courses listed.", "Course count",
-                        JOptionPane.CLOSED_OPTION);
-            }
+        count.addActionListener(e -> {
+            JOptionPane.showMessageDialog(main,
+                    "There are currently " + courses_table.getRowCount() + " courses listed.", "Course count",
+                    JOptionPane.CLOSED_OPTION);
         });
         tablePopupMenu.add(count);
-
-        tablePopupMenu.add(new JSeparator());
-
-        // display number of unenrolled students
-        JMenuItem unenrolled_count = new JMenuItem("Unenrolled Students");
-        unenrolled_count.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(main,
-                        "There are currently TODO student\\s unenrolled.",
-                        "Unenrolled count", JOptionPane.CLOSED_OPTION);
-            }
-        });
-        tablePopupMenu.add(unenrolled_count);
 
         tablePopupMenu.add(new JSeparator());
 
@@ -96,7 +81,26 @@ public class Table_Manager {
                             "Select a course.", "No Selection",
                             JOptionPane.CLOSED_OPTION);
                 else {
+                    try {
+                        // create a query to count the students in the course
+                        String selected_course = courses_table.getValueAt(courses_table.getSelectedRow(), 0).toString();
 
+                        // execute the query
+                        PreparedStatement count_statement = Data_Manager.getConnection()
+                                .prepareStatement("SELECT COUNT(course_code) FROM students WHERE course_code = \""
+                                        + selected_course + "\";");
+                        ResultSet rs = count_statement.executeQuery();
+                        rs.next();
+
+                        // display the data
+                        JOptionPane.showMessageDialog(main, "There are currently " + rs.getLong("COUNT(course_code)")
+                                + " enrolled in " + selected_course + ".", "Student count", JOptionPane.CLOSED_OPTION);
+
+                        count_statement.close();
+                    } catch (SQLException e1) {
+                        JOptionPane.showMessageDialog(main, "MySQL Error: " + e1.getMessage(), "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         });

@@ -16,15 +16,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
+import javax.swing.table.DefaultTableModel;
 
-import control.Add_Process;
+import control.Edit_Process;
 import model.Table_Manager;
 
 /**
- * Display and facilitates the adding row dialog and editing the data of the
- * selected rows
+ * Display and facilitates the editing row dialog and editing the data of the
+ * selected rows.
  */
-public class Add_Dialog extends JDialog {
+public class Edit_Dialog extends JDialog {
     private final int DIALOG_WIDTH = 400;
     private final int DIALOG_HEIGHT = 300;
     private final Dimension dialog_dimension = new Dimension(DIALOG_WIDTH, DIALOG_HEIGHT);
@@ -54,13 +55,13 @@ public class Add_Dialog extends JDialog {
     private JLabel course_name_label;
     private JTextField course_name_data;
 
-    private JButton add_button;
+    private JButton edit_button;
 
-    private Add_Process add_data;
+    private Edit_Process edit_data;
 
-    public Add_Dialog(JTable table, JFrame main) {
+    public Edit_Dialog(JTable table, JFrame main) {
         // setup the dialog
-        this.setTitle("Adding Item:");
+        this.setTitle("Edit Item:");
         this.getContentPane().setPreferredSize(dialog_dimension);
         this.setResizable(false);
         this.setLayout(grid_bag_layout);
@@ -69,22 +70,32 @@ public class Add_Dialog extends JDialog {
         this.setModalityType(DEFAULT_MODALITY_TYPE);
         this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-        add_data = new Add_Process(table, this);
+        edit_data = new Edit_Process(table, this);
 
-        // if the table selected is the student table, else use the data from the course
-        // table
+        /*
+         * If the table selected is the student table, else use the data from the course
+         * table.
+         */
         if (table.equals(Table_Manager.getStudentTable()))
-            displayAddStudent(table);
+            displayEditStudent(Table_Manager.getStudentTable());
         else
-            displayAddCourse(table);
+            displayEditCourse(Table_Manager.getCourseTable());
     }
 
     /**
-     * JDialog for adding students.
+     * JDialog for editing courses.
      * 
      * @param student_table
      */
-    private void displayAddStudent(JTable student_table) {
+    private void displayEditStudent(JTable student_table) {
+        // retrieving the data from each cell of the row
+        String[] selected_row_data = new String[student_table.getColumnCount()];
+
+        // get the selected row and the data in its cells
+        int table_row_selected = student_table.getSelectedRow();
+        for (int column = 0; column < student_table.getColumnCount(); column++)
+            selected_row_data[column] = student_table.getValueAt(table_row_selected, column).toString();
+
         // Arranging the displays
         surname_label = new JLabel("Surname: ");
         layout_Constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -94,6 +105,7 @@ public class Add_Dialog extends JDialog {
 
         surname_data = new JTextField();
         surname_data.setPreferredSize(new Dimension(200, 30));
+        surname_data.setText(selected_row_data[0]);
         layout_Constraints.gridx = 1;
         layout_Constraints.gridy = 0;
         this.add(surname_data, layout_Constraints);
@@ -106,6 +118,7 @@ public class Add_Dialog extends JDialog {
 
         first_name_data = new JTextField();
         first_name_data.setPreferredSize(new Dimension(200, 30));
+        first_name_data.setText(selected_row_data[1]);
         layout_Constraints.gridx = 1;
         layout_Constraints.gridy = 1;
         this.add(first_name_data, layout_Constraints);
@@ -118,6 +131,7 @@ public class Add_Dialog extends JDialog {
 
         middle_name_data = new JTextField();
         middle_name_data.setPreferredSize(new Dimension(200, 30));
+        middle_name_data.setText(selected_row_data[2]);
         layout_Constraints.gridx = 1;
         layout_Constraints.gridy = 2;
         this.add(middle_name_data, layout_Constraints);
@@ -130,6 +144,7 @@ public class Add_Dialog extends JDialog {
 
         ID_number_data = new JTextField();
         ID_number_data.setPreferredSize(new Dimension(200, 30));
+        ID_number_data.setText(selected_row_data[3]);
         layout_Constraints.gridx = 1;
         layout_Constraints.gridy = 3;
         this.add(ID_number_data, layout_Constraints);
@@ -142,6 +157,7 @@ public class Add_Dialog extends JDialog {
 
         year_level_data = new JComboBox<>(
                 new String[] { "1st year", "2nd year", "3rd year", "4th year", "5th year", "6th year", "More..." });
+        year_level_data.setSelectedItem(selected_row_data[4]);
         layout_Constraints.gridx = 1;
         layout_Constraints.gridy = 4;
         this.add(year_level_data, layout_Constraints);
@@ -154,6 +170,7 @@ public class Add_Dialog extends JDialog {
 
         gender_data = new JTextField();
         gender_data.setPreferredSize(new Dimension(200, 30));
+        gender_data.setText(selected_row_data[5]);
         layout_Constraints.gridx = 1;
         layout_Constraints.gridy = 5;
         this.add(gender_data, layout_Constraints);
@@ -175,10 +192,13 @@ public class Add_Dialog extends JDialog {
 
         Arrays.sort(courses_listed);
 
-        course_data = new JComboBox<>(courses_listed);
+        course_data = new JComboBox<>();
+        for (String course : courses_listed) {
+            course_data.addItem(course);
+            if (course.split("-")[0].equals(selected_row_data[6]))
+                course_data.setSelectedItem(course);
+        }
         course_data.setPreferredSize(new Dimension(300, 30));
-        // set the default selection to unenrolled
-        course_data.setSelectedItem("N/A-Not Enrolled");
         course_data.addActionListener(e -> {
             course_data.setToolTipText(course_data.getSelectedItem().toString());
         });
@@ -189,23 +209,41 @@ public class Add_Dialog extends JDialog {
         this.add(course_data, layout_Constraints);
 
         // arranging the button and setting its functionality
-        add_button = new JButton("Add Item");
-        add_button.setFocusable(false);
-        add_button.setToolTipText("Add the item to the table.");
-        add_button.addActionListener(new ActionListener() {
+        edit_button = new JButton("Edit Item");
+        edit_button.setFocusable(false);
+        edit_button.setToolTipText("Add the edited item to the table.");
+        edit_button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // check if there is at least one field empty
                 if (surname_data.getText().isEmpty() || first_name_data.getText().isEmpty() ||
-                        middle_name_data.getText().isEmpty() || ID_number_data.getText().isEmpty() ||
-                        gender_data.getText().isEmpty())
-                    JOptionPane.showMessageDialog(Add_Dialog.this, "Fill all fields.");
+                        middle_name_data.getText().isEmpty() || ID_number_data.getText().isEmpty()
+                        || gender_data.getText().isEmpty())
+                    JOptionPane.showMessageDialog(Edit_Dialog.this, "Fill all fields.");
 
+                // check if there are changes
+                else if (surname_data.getText().toString()
+                        .equals(student_table.getValueAt(table_row_selected, 0).toString())
+                        && first_name_data.getText().toString()
+                                .equals(student_table.getValueAt(table_row_selected, 1).toString())
+                        && middle_name_data.getText().toString()
+                                .equals(student_table.getValueAt(table_row_selected, 2).toString())
+                        && ID_number_data.getText().toString()
+                                .equals(student_table.getValueAt(table_row_selected, 3).toString())
+                        && year_level_data.getSelectedItem().toString()
+                                .equals(student_table.getValueAt(table_row_selected, 4).toString())
+                        && gender_data.getText().toString()
+                                .equals(student_table.getValueAt(table_row_selected, 5).toString())
+                        && course_data.getSelectedItem().toString().split("-")[0]
+                                .equals(student_table.getValueAt(table_row_selected, 6).toString())) {
+                    JOptionPane.showMessageDialog(Edit_Dialog.this, "No changes were made.");
+                    Edit_Dialog.this.dispose();
+                }
                 // add the new data to the table then close the dialog
                 else
-                    add_data.studentAdd(surname_data.getText().toString(), first_name_data.getText().toString(),
-                            middle_name_data.getText().toString(), ID_number_data.getText().toString(),
-                            year_level_data.getSelectedItem().toString(),
+                    edit_data.studentEdit(table_row_selected, surname_data.getText().toString(),
+                            first_name_data.getText().toString(), middle_name_data.getText().toString(),
+                            ID_number_data.getText().toString(), year_level_data.getSelectedItem().toString(),
                             gender_data.getText().toString(), course_data.getSelectedItem().toString().split("-")[0]);
             }
         });
@@ -213,15 +251,26 @@ public class Add_Dialog extends JDialog {
         layout_Constraints.gridx = 0;
         layout_Constraints.gridy = 9;
         layout_Constraints.gridwidth = 2;
-        this.add(add_button, layout_Constraints);
+        this.add(edit_button, layout_Constraints);
     }
 
     /**
-     * JDialog for adding course.
+     * JDialog for editing students.
      * 
      * @param course_table
      */
-    private void displayAddCourse(JTable course_table) {
+    private void displayEditCourse(JTable course_table) {
+        // setup the table model to edit the rows
+        DefaultTableModel course_table_model = (DefaultTableModel) course_table.getModel();
+
+        // retrieving the data from each cell of the row
+        String[] selected_row_data = new String[course_table_model.getColumnCount()];
+
+        // get the selected row and the data in its cells
+        int table_row_selected = course_table.getSelectedRow();
+        for (int column = 0; column < course_table.getColumnCount(); column++)
+            selected_row_data[column] = course_table.getValueAt(table_row_selected, column).toString();
+
         // Arranging the displays
         course_code_label = new JLabel("Course Code: ");
         layout_Constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -232,6 +281,7 @@ public class Add_Dialog extends JDialog {
 
         course_code_data = new JTextField();
         course_code_data.setPreferredSize(new Dimension(200, 30));
+        course_code_data.setText(selected_row_data[0]);
         layout_Constraints.gridx = 0;
         layout_Constraints.gridy = 1;
         layout_Constraints.gridwidth = 2;
@@ -245,29 +295,43 @@ public class Add_Dialog extends JDialog {
 
         course_name_data = new JTextField();
         course_name_data.setPreferredSize(new Dimension(200, 30));
+        course_name_data.setText(selected_row_data[1]);
         layout_Constraints.gridx = 0;
         layout_Constraints.gridy = 3;
         layout_Constraints.gridwidth = 2;
         this.add(course_name_data, layout_Constraints);
 
         // arranging the button and setting its functionality
-        add_button = new JButton("Add Item");
+        edit_button = new JButton("Edit Item");
         layout_Constraints.gridx = 0;
         layout_Constraints.gridy = 9;
         layout_Constraints.gridwidth = 2;
-        add_button.setFocusable(false);
-        add_button.setToolTipText("Add the item to the table.");
-        add_button.addActionListener(new ActionListener() {
+        edit_button.setFocusable(false);
+        edit_button.setToolTipText("Add the edited item to the table.");
+        edit_button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // check if there is at least one field empty
                 if (course_code_data.getText().isEmpty() || course_name_data.getText().isEmpty())
-                    JOptionPane.showMessageDialog(Add_Dialog.this, "Fill all fields.");
+                    JOptionPane.showMessageDialog(Edit_Dialog.this, "Fill all fields.");
+
+                // check if there are changes
+                else if (course_code_data.getText().toString()
+                        .equals(course_table.getValueAt(table_row_selected, 0).toString())
+                        && course_name_data.getText().toString()
+                                .equals(course_table.getValueAt(table_row_selected, 1).toString())) {
+                    JOptionPane.showMessageDialog(Edit_Dialog.this, "No changes were made.");
+                    Edit_Dialog.this.dispose();
+                }
                 // add the new data to the table then close the dialog
-                else
-                    add_data.courseAdd(course_code_data.getText().toString(), course_name_data.getText().toString());
+                else {
+                    selected_row_data[0] = course_code_data.getText().toString();
+                    selected_row_data[1] = course_name_data.getText().toString();
+
+                    edit_data.courseEdit(table_row_selected, selected_row_data[0], selected_row_data[1]);
+                }
             }
         });
-        this.add(add_button, layout_Constraints);
+        this.add(edit_button, layout_Constraints);
     }
 }

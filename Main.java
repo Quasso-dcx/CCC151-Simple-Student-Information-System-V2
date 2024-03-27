@@ -1,14 +1,19 @@
-import javax.swing.SwingUtilities;
+import model.Data_Manager;
+import view.Login_Dialog;
 
-import view.SSIS_Main_Display;
-
+/**
+ * Runs the SSIS app.
+ *
+ * @author Caine Ivan R. Bautista
+ * @date March 28,2024
+ */
 public class Main {
      public static void main(String[] args) {
           try {
-               SwingUtilities.invokeLater(SSIS_Main_Display::new);
-
+               new Data_Manager();
+               new Login_Dialog("You want Access???").setVisible(true);
           } catch (Exception e) {
-               System.out.println(e.toString());
+               e.printStackTrace();
           }
      }
 }
