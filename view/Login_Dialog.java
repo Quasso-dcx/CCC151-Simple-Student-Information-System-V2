@@ -87,7 +87,7 @@ public class Login_Dialog extends JFrame {
                     // if the connection is successful, display the main frame
                     if (Data_Manager.getAccess()) {
                          JOptionPane.showMessageDialog(Login_Dialog.this, "Access Gained. Congrats??", "Happy??",
-                                   JOptionPane.INFORMATION_MESSAGE);
+                                   JOptionPane.DEFAULT_OPTION);
                          Login_Dialog.this.dispose();
                          SwingUtilities.invokeLater(SSIS_Main_Display::new);
                     }

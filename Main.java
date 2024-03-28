@@ -10,7 +10,10 @@ import view.Login_Dialog;
 public class Main {
      public static void main(String[] args) {
           try {
+               // create an instance to connect to the database
                new Data_Manager();
+
+               // start with the login dialog
                new Login_Dialog("You want Access???").setVisible(true);
           } catch (Exception e) {
                e.printStackTrace();

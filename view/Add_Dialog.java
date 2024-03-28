@@ -5,7 +5,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -128,8 +132,22 @@ public class Add_Dialog extends JDialog {
         layout_Constraints.gridy = 3;
         this.add(ID_number_label, layout_Constraints);
 
-        ID_number_data = new JTextField();
+        ID_number_data = new JTextField("YYYY-MMMM");
         ID_number_data.setPreferredSize(new Dimension(200, 30));
+        ID_number_data.addFocusListener(new FocusListener() {
+            // This is to add a placeholder inside the textfield.
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (ID_number_data.getText().equals("YYYY-MMMM"))
+                    ID_number_data.setText("");
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (ID_number_data.getText().isEmpty())
+                    ID_number_data.setText("YYYY-MMMM");
+            }
+        });
         layout_Constraints.gridx = 1;
         layout_Constraints.gridy = 3;
         this.add(ID_number_data, layout_Constraints);
@@ -198,15 +216,18 @@ public class Add_Dialog extends JDialog {
                 // check if there is at least one field empty
                 if (surname_data.getText().isEmpty() || first_name_data.getText().isEmpty() ||
                         middle_name_data.getText().isEmpty() || ID_number_data.getText().isEmpty() ||
-                        gender_data.getText().isEmpty())
-                    JOptionPane.showMessageDialog(Add_Dialog.this, "Fill all fields.");
+                        ID_number_data.getText().equals("YYYY-MMMM") || gender_data.getText().isEmpty())
+                    JOptionPane.showMessageDialog(Add_Dialog.this, "Fill all fields.", "Missing Information",
+                            JOptionPane.WARNING_MESSAGE);
+                else {
+                    // add the new data to the table if the ID is valid then close the dialog
+                    if (isIDValid(ID_number_data.getText().toString()))
+                        add_data.studentAdd(surname_data.getText().toString(), first_name_data.getText().toString(),
+                                middle_name_data.getText().toString(), ID_number_data.getText().toString(),
+                                year_level_data.getSelectedItem().toString(), gender_data.getText().toString(),
+                                course_data.getSelectedItem().toString().split("-")[0]);
 
-                // add the new data to the table then close the dialog
-                else
-                    add_data.studentAdd(surname_data.getText().toString(), first_name_data.getText().toString(),
-                            middle_name_data.getText().toString(), ID_number_data.getText().toString(),
-                            year_level_data.getSelectedItem().toString(),
-                            gender_data.getText().toString(), course_data.getSelectedItem().toString().split("-")[0]);
+                }
             }
         });
         layout_Constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -214,6 +235,37 @@ public class Add_Dialog extends JDialog {
         layout_Constraints.gridy = 9;
         layout_Constraints.gridwidth = 2;
         this.add(add_button, layout_Constraints);
+    }
+
+    /**
+     * Check if the ID is in the correct format.
+     * 
+     * @param ID_number
+     * @return
+     */
+    private boolean isIDValid(String ID_number) {
+        if (ID_number.length() != 9) {
+            JOptionPane.showMessageDialog(Add_Dialog.this, "Should be YYYY-MMMM format. Length should be 9",
+                    "Invalid ID Format", JOptionPane.ERROR_MESSAGE);
+            return false;
+        } else {
+            // Define the pattern using regular expression
+            String pattern = "\\d{4}-\\d{4}";
+
+            // Compile the pattern
+            Pattern p = Pattern.compile(pattern);
+
+            // Match the input string with the pattern
+            Matcher m = p.matcher(ID_number);
+
+            if (!m.matches()) {
+                JOptionPane.showMessageDialog(Add_Dialog.this, "Should be YYYY-MMMM format. With no alphabets.",
+                        "Invalid ID Format", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+
+            return true;
+        }
     }
 
     /**
@@ -262,7 +314,8 @@ public class Add_Dialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 // check if there is at least one field empty
                 if (course_code_data.getText().isEmpty() || course_name_data.getText().isEmpty())
-                    JOptionPane.showMessageDialog(Add_Dialog.this, "Fill all fields.");
+                    JOptionPane.showMessageDialog(Add_Dialog.this, "Fill all fields.", "Missing Information",
+                            JOptionPane.WARNING_MESSAGE);
                 // add the new data to the table then close the dialog
                 else
                     add_data.courseAdd(course_code_data.getText().toString(), course_name_data.getText().toString());

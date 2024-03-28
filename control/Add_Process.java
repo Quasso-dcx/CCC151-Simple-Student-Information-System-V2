@@ -67,7 +67,7 @@ public class Add_Process {
             this.add_dialog.dispose();
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this.add_dialog, "MySQL Error: " + e.getMessage(), " Error",
+            JOptionPane.showMessageDialog(this.add_dialog, "MySQL Error: " + e.getMessage(), "Add Data Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -101,7 +101,7 @@ public class Add_Process {
             this.add_dialog.dispose();
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this.add_dialog, "MySQL Error: " + e.getMessage(), " Error",
+            JOptionPane.showMessageDialog(this.add_dialog, "MySQL Error: " + e.getMessage(), "Add Data Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }

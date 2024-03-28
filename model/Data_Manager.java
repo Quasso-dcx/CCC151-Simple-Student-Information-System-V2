@@ -37,9 +37,8 @@ public class Data_Manager {
 
                Data_Manager.allow_access = true;
           } catch (SQLException e) {
-               JOptionPane.showMessageDialog(null,
-                         "Failed to connect to the database.\nPlease check your username and password.",
-                         "Connection Error", JOptionPane.ERROR_MESSAGE);
+               JOptionPane.showMessageDialog(null, "MySQL Error: " + e.getMessage(), "Connection Error",
+                         JOptionPane.ERROR_MESSAGE);
           }
      }
 

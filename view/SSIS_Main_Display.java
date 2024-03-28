@@ -9,6 +9,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.sql.SQLException;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -22,8 +23,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
-
-import java.sql.SQLException;
 
 import control.Delete_Process;
 import control.Filter_Process;
@@ -200,8 +199,7 @@ public class SSIS_Main_Display extends JFrame {
                public void actionPerformed(ActionEvent e) {
                     if (display_table.getSelectedRow() < 0)
                          JOptionPane.showMessageDialog(SSIS_Main_Display.this, "Please select a row.",
-                                   "Edit Data Error",
-                                   JOptionPane.DEFAULT_OPTION);
+                                   "Edit Data Error", JOptionPane.ERROR_MESSAGE);
                     // display the edit_dialog
                     else
                          new Edit_Dialog(display_table, SSIS_Main_Display.this).setVisible(true);
@@ -219,8 +217,7 @@ public class SSIS_Main_Display extends JFrame {
                public void actionPerformed(ActionEvent e) {
                     if (display_table.getSelectedRow() < 0)
                          JOptionPane.showMessageDialog(SSIS_Main_Display.this, "Please select a row.",
-                                   "Delete Data Error",
-                                   JOptionPane.DEFAULT_OPTION);
+                                   "Delete Data Error", JOptionPane.ERROR_MESSAGE);
                     else
                          new Delete_Process(display_table, SSIS_Main_Display.this); // facilitate the deletion process
                }
@@ -287,11 +284,10 @@ public class SSIS_Main_Display extends JFrame {
                     // secure that something is inputted to be search and a column is selected
                     if (column_names.getSelectedItem().equals(column_names.getItemAt(0)))
                          JOptionPane.showMessageDialog(SSIS_Main_Display.this, "Select a column.", "Invalid Column",
-                                   JOptionPane.CLOSED_OPTION);
+                                   JOptionPane.WARNING_MESSAGE);
                     else if (search_input.getText().equals("") || search_input.getText().equals("Search Here"))
                          JOptionPane.showMessageDialog(SSIS_Main_Display.this, "Enter something to search.",
-                                   "Empty Search",
-                                   JOptionPane.CLOSED_OPTION);
+                                   "Empty Search", JOptionPane.WARNING_MESSAGE);
                     else
                          Filter_Process.regexFilter(display_table, search_input.getText().toString(),
                                    column_names.getSelectedIndex() - 1);

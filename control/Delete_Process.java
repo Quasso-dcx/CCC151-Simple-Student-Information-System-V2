@@ -73,7 +73,7 @@ public class Delete_Process {
                     JOptionPane.CLOSED_OPTION);
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(main, "MySQL Error: " + e.getMessage(), "Error",
+            JOptionPane.showMessageDialog(main, "MySQL Error: " + e.getMessage(), "Delete Data Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -137,7 +137,7 @@ public class Delete_Process {
                     JOptionPane.CLOSED_OPTION);
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(main, "MySQL Error: " + e.getMessage(), "Error",
+            JOptionPane.showMessageDialog(main, "MySQL Error: " + e.getMessage(), "Delete Data Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }

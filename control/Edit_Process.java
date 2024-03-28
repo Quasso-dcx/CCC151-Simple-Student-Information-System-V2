@@ -76,7 +76,7 @@ public class Edit_Process {
             JOptionPane.showMessageDialog(this.edit_dialog, "Edit Success.");
             this.edit_dialog.dispose();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this.edit_dialog, "MySQL Error: " + e.getMessage(), " Error",
+            JOptionPane.showMessageDialog(this.edit_dialog, "MySQL Error: " + e.getMessage(), "Edit Data Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -154,7 +154,7 @@ public class Edit_Process {
             JOptionPane.showMessageDialog(this.edit_dialog, "Edit Success.");
             this.edit_dialog.dispose();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this.edit_dialog, "MySQL Error: " + e.getMessage(), " Error",
+            JOptionPane.showMessageDialog(this.edit_dialog, "MySQL Error: " + e.getMessage(), "Edit Data Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
