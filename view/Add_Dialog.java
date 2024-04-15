@@ -259,7 +259,7 @@ public class Add_Dialog extends JDialog {
             Matcher m = p.matcher(ID_number);
 
             if (!m.matches()) {
-                JOptionPane.showMessageDialog(Add_Dialog.this, "Should be YYYY-MMMM format. With no alphabets.",
+                JOptionPane.showMessageDialog(Add_Dialog.this, "Should be YYYY-MMMM format. With only numbers.",
                         "Invalid ID Format", JOptionPane.ERROR_MESSAGE);
                 return false;
             }

@@ -82,11 +82,11 @@ public class Login_Dialog extends JFrame {
                public void actionPerformed(ActionEvent e) {
                     // connect to the database based on the login credentials
                     Data_Manager.createConnection(username_input.getText(), new String(password_input.getPassword()));
-                    Login_Dialog.this.setTitle("Try Again HAHAHAHAHA");
+                    Login_Dialog.this.setTitle("Incorrect Username or Password.");
 
                     // if the connection is successful, display the main frame
                     if (Data_Manager.getAccess()) {
-                         JOptionPane.showMessageDialog(Login_Dialog.this, "Access Gained. Congrats??", "Happy??",
+                         JOptionPane.showMessageDialog(Login_Dialog.this, "Login Successful", "Access Granted",
                                    JOptionPane.DEFAULT_OPTION);
                          Login_Dialog.this.dispose();
                          SwingUtilities.invokeLater(SSIS_Main_Display::new);

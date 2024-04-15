@@ -14,7 +14,7 @@ public class Main {
                new Data_Manager();
 
                // start with the login dialog
-               new Login_Dialog("You want Access???").setVisible(true);
+               new Login_Dialog("Connect to Database.").setVisible(true);
           } catch (Exception e) {
                e.printStackTrace();
           }

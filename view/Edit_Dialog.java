@@ -23,6 +23,7 @@ import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
 import control.Edit_Process;
+import control.Filter_Process;
 import model.Table_Manager;
 
 /**
@@ -297,7 +298,7 @@ public class Edit_Dialog extends JDialog {
             Matcher m = p.matcher(ID_number);
 
             if (!m.matches()) {
-                JOptionPane.showMessageDialog(Edit_Dialog.this, "Should be YYYY-MMMM format. With no alphabets.",
+                JOptionPane.showMessageDialog(Edit_Dialog.this, "Should be YYYY-MMMM format. With only numbers.",
                         "Invalid ID Format", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
@@ -380,11 +381,36 @@ public class Edit_Dialog extends JDialog {
                 else {
                     selected_row_data[0] = course_code_data.getText().toString();
                     selected_row_data[1] = course_name_data.getText().toString();
-
-                    edit_data.courseEdit(table_row_selected, selected_row_data[0], selected_row_data[1]);
+                    if (isCodeUnique(course_table, selected_row_data[0], table_row_selected))
+                        edit_data.courseEdit(table_row_selected, selected_row_data[0], selected_row_data[1]);
                 }
             }
         });
         this.add(edit_button, layout_Constraints);
+    }
+
+    /**
+     * Check if the course code is unique.
+     * 
+     * @param course_table
+     * @param course_code_pattern
+     * @param table_row_selected
+     * @return
+     */
+    private boolean isCodeUnique(JTable course_table, String course_code_pattern, int table_row_selected) {
+        // filter the course_code
+        Filter_Process.rowFilter(course_table, course_code_pattern, 0);
+
+        if (course_table.getRowCount() > 0) {
+            JOptionPane.showMessageDialog(Edit_Dialog.this, "Course Name: " + course_code_pattern + "\nalready exist.",
+                    "Duplication of Entry", JOptionPane.ERROR_MESSAGE);
+            Filter_Process.cancelFilter(course_table);
+            course_table.setRowSelectionInterval(table_row_selected, table_row_selected);
+            return false;
+        }
+
+        Filter_Process.cancelFilter(course_table);
+        course_table.setRowSelectionInterval(table_row_selected, table_row_selected);
+        return true;
     }
 }

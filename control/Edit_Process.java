@@ -2,6 +2,7 @@ package control;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -52,7 +53,7 @@ public class Edit_Process {
             edit_statement.setString(5, new_year_level);
             edit_statement.setString(6, new_gender);
             if (new_course_code.equals("N/A"))
-                edit_statement.setNull(7, java.sql.Types.NULL);
+                edit_statement.setNull(7, Types.NULL);
             else
                 edit_statement.setString(7, new_course_code);
             edit_statement.setString(8, old_ID_number);

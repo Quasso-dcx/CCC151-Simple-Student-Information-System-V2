@@ -87,8 +87,8 @@ public class SSIS_Main_Display extends JFrame {
                     } catch (SQLException ex) {
                          // incase an error on closing the connection
                          JOptionPane.showMessageDialog(SSIS_Main_Display.this,
-                                   "Failed to connect to the database.\nPlease check your username and password.",
-                                   "Connection Error", JOptionPane.ERROR_MESSAGE);
+                                   "Failed to Close the Connection.",
+                                   "Disconnection Error", JOptionPane.ERROR_MESSAGE);
                     }
                }
           };

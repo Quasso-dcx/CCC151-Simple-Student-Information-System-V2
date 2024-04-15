@@ -31,7 +31,12 @@ public class Data_Manager {
       */
      public static void createConnection(String username, String password) {
           try {
-               connect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ssis_database", username, password);
+               // change for new connection
+               String sql_name = "mysql";
+               String port = "127.0.0.1:3306";
+               String connection_name = "ssis_database";
+               connect = DriverManager.getConnection("jdbc:" + sql_name + "://" + port + "/" + connection_name,
+                         username, password);
                getCoursesData(connect);
                getStudentsData(connect);
 
