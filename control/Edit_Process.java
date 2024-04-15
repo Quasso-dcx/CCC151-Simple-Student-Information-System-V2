@@ -98,13 +98,17 @@ public class Edit_Process {
             PreparedStatement edit_statement;
             // if the course code was changed
             if (!new_course_code.equals(course_table.getValueAt(table_row_selected, 0))) {
-                String fkc_name = "fk_course_code"; // the foreign key constraint name
+                // String fkc_name = "fk_course_code"; // the foreign key constraint name
 
                 // remove the constraint first
-                String remove_constraint = "ALTER TABLE students DROP CONSTRAINT " + fkc_name + ";";
-                PreparedStatement remove_fkc = Data_Manager.getConnection().prepareStatement(remove_constraint);
-                remove_fkc.execute();
-                remove_fkc.close();
+                /*
+                 * String remove_constraint = "ALTER TABLE students DROP CONSTRAINT " + fkc_name
+                 * + ";";
+                 * PreparedStatement remove_fkc =
+                 * Data_Manager.getConnection().prepareStatement(remove_constraint);
+                 * remove_fkc.execute();
+                 * remove_fkc.close();
+                 */
 
                 // update the courses table in the database
                 String update_courses = "UPDATE courses SET course_code = ?, course_name = ? WHERE course_code = ?;";
@@ -134,11 +138,16 @@ public class Edit_Process {
                         student_table.setValueAt(new_course_code, row_count, student_table.getColumnCount() - 1);
 
                 // add back the constraint
-                String add_constraint = "ALTER TABLE students ADD CONSTRAINT " + fkc_name
-                        + " FOREIGN KEY(course_code) REFERENCES courses(course_code) ON DELETE SET NULL;";
-                PreparedStatement add_fkc = Data_Manager.getConnection().prepareStatement(add_constraint);
-                add_fkc.execute();
-                add_fkc.close();
+                /*
+                 * String add_constraint = "ALTER TABLE students ADD CONSTRAINT " + fkc_name
+                 * +
+                 * " FOREIGN KEY(course_code) REFERENCES courses(course_code) ON DELETE SET NULL;"
+                 * ;
+                 * PreparedStatement add_fkc =
+                 * Data_Manager.getConnection().prepareStatement(add_constraint);
+                 * add_fkc.execute();
+                 * add_fkc.close();
+                 */
             } else {
                 // if the course name is the only changed value, update the database and JTable
                 String query = "UPDATE courses SET course_name = ? WHERE course_code = ?;";

@@ -23,6 +23,8 @@ public class Table_Manager {
     private JPopupMenu tablePopupMenu;
 
     public Table_Manager(JFrame main) {
+        // create an instance to connect to the database
+        new Data_Manager();
         processCourseTable(main);
         processStudentTable(main);
     }

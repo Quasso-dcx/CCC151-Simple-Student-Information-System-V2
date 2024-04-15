@@ -21,6 +21,7 @@ public class Data_Manager {
      private static boolean allow_access = false;
 
      public Data_Manager() {
+          createConnection();
      }
 
      /**
@@ -29,31 +30,19 @@ public class Data_Manager {
       * @param username
       * @param password
       */
-     public static void createConnection(String username, String password) {
+     private static void createConnection() {
           try {
                // change for new connection
-               String sql_name = "mysql";
-               String port = "127.0.0.1:3306";
-               String connection_name = "ssis_database";
-               connect = DriverManager.getConnection("jdbc:" + sql_name + "://" + port + "/" + connection_name,
-                         username, password);
+               String sql_name = "sqlite";
+               String connection_path = "database/ssis_v2_database.db";
+               connect = DriverManager.getConnection("jdbc:" + sql_name + ":" + connection_path);
+               connect.setAutoCommit(true);
                getCoursesData(connect);
                getStudentsData(connect);
-
-               Data_Manager.allow_access = true;
           } catch (SQLException e) {
                JOptionPane.showMessageDialog(null, "MySQL Error: " + e.getMessage(), "Connection Error",
                          JOptionPane.ERROR_MESSAGE);
           }
-     }
-
-     /**
-      * Share the access. For the Login.
-      * 
-      * @return allow_access
-      */
-     public static boolean getAccess() {
-          return Data_Manager.allow_access;
      }
 
      /**

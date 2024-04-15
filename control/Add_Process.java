@@ -43,14 +43,17 @@ public class Add_Process {
             PreparedStatement insert_statement;
             if (course_code_data.equals("N/A"))
                 insert_statement = Data_Manager.getConnection().prepareStatement(
-                        "INSERT INTO students (last_name, first_name, middle_name, id_number, year_level, gender) VALUE (\""
+                        "INSERT INTO students (last_name, first_name, middle_name, id_number, year_level, gender) VALUES(\""
                                 + surname_data + "\",\"" + first_name_data + "\",\"" + middle_name_data + "\",\""
                                 + ID_number_data + "\",\"" + year_level_data + "\",\"" + gender_data + "\")");
             else
                 insert_statement = Data_Manager.getConnection()
-                        .prepareStatement("INSERT INTO students VALUE (\"" + surname_data + "\",\"" + first_name_data
-                                + "\",\"" + middle_name_data + "\",\"" + ID_number_data + "\",\"" + year_level_data
-                                + "\",\"" + gender_data + "\",\"" + course_code_data + "\")");
+                        .prepareStatement(
+                                "INSERT INTO students (last_name, first_name, middle_name, id_number, year_level, gender, course_code) VALUES(\""
+                                        + surname_data + "\",\"" + first_name_data
+                                        + "\",\"" + middle_name_data + "\",\"" + ID_number_data + "\",\""
+                                        + year_level_data
+                                        + "\",\"" + gender_data + "\",\"" + course_code_data + "\")");
 
             // execute the query
             insert_statement.execute();
@@ -85,7 +88,8 @@ public class Add_Process {
 
             // create the query
             PreparedStatement insert_statement = Data_Manager.getConnection().prepareStatement(
-                    "INSERT INTO courses VALUE (\"" + course_code_data + "\",\"" + course_name_data + "\")");
+                    "INSERT INTO courses (course_code, course_name) VALUES(\"" + course_code_data + "\",\""
+                            + course_name_data + "\")");
 
             // execute the query
             insert_statement.execute();

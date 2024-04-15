@@ -1,5 +1,6 @@
-import model.Data_Manager;
-import view.Login_Dialog;
+import javax.swing.SwingUtilities;
+
+import view.SSIS_Main_Display;
 
 /**
  * Runs the SSIS app.
@@ -10,11 +11,7 @@ import view.Login_Dialog;
 public class Main {
      public static void main(String[] args) {
           try {
-               // create an instance to connect to the database
-               new Data_Manager();
-
-               // start with the login dialog
-               new Login_Dialog("Connect to Database.").setVisible(true);
+               SwingUtilities.invokeLater(SSIS_Main_Display::new);
           } catch (Exception e) {
                e.printStackTrace();
           }
