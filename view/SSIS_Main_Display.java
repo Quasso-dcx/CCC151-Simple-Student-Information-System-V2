@@ -137,6 +137,7 @@ public class SSIS_Main_Display extends JFrame {
                     courses_button.setEnabled(true);
 
                     display_table.getSelectionModel().clearSelection(); // clear the previous table selection
+                    Filter_Process.cancelFilter(display_table); // cancel the filter
                     display_table = student_table; // change the table to be displayed
                     refreshTable(); // refresh the display table
                     refreshFilterArea();
@@ -157,6 +158,7 @@ public class SSIS_Main_Display extends JFrame {
                     students_button.setEnabled(true);
 
                     display_table.getSelectionModel().clearSelection(); // clear the previous table selection
+                    Filter_Process.cancelFilter(display_table); // cancel the filter
                     display_table = course_table; // change the table to be displayed
                     refreshTable(); // refresh the display table
                     refreshFilterArea();

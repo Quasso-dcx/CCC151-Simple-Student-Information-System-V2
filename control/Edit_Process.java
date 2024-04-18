@@ -98,7 +98,7 @@ public class Edit_Process {
             PreparedStatement edit_statement;
             // if the course code was changed
             if (!new_course_code.equals(course_table.getValueAt(table_row_selected, 0))) {
-                String fkc_name = "fk_course_code"; // the foreign key constraint name
+                String fkc_name = "students_courses_fk"; // the foreign key constraint name
 
                 // remove the constraint first
                 String remove_constraint = "ALTER TABLE students DROP CONSTRAINT " + fkc_name + ";";
