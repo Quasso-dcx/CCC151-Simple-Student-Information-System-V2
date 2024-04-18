@@ -12,4 +12,4 @@
 > 2nd Year - BS Computer Science 
 
 # Reminders
-- This is not finished. Still subject to changes. TY.
+- 
