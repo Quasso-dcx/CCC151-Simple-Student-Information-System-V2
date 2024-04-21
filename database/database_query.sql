@@ -4,7 +4,7 @@
 -- Port: 3306
 
 -- Use only if there existing schema
--- DROP DATABASE ssis_database;
+DROP DATABASE IF EXISTS ssis_database;
 
 CREATE DATABASE ssis_database;
 
