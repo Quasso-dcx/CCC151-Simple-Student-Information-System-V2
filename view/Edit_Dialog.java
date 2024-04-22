@@ -398,15 +398,24 @@ public class Edit_Dialog extends JDialog {
      * @return
      */
     private boolean isCodeUnique(JTable course_table, String course_code_pattern, int table_row_selected) {
+        String selected_course_code = course_table.getValueAt(table_row_selected, 0).toString();
+
         // filter the course_code
         Filter_Process.rowFilter(course_table, course_code_pattern, 0);
 
         if (course_table.getRowCount() > 0) {
-            JOptionPane.showMessageDialog(Edit_Dialog.this, "Course Name: " + course_code_pattern + "\nalready exist.",
-                    "Duplication of Entry", JOptionPane.ERROR_MESSAGE);
-            Filter_Process.cancelFilter(course_table);
-            course_table.setRowSelectionInterval(table_row_selected, table_row_selected);
-            return false;
+            // just get the first row
+            String remaining_course_code = course_table.getValueAt(0, 0).toString();
+
+            // compare if the selected data is the same with the remaining data
+            if (!remaining_course_code.equals(selected_course_code)) {
+                JOptionPane.showMessageDialog(Edit_Dialog.this,
+                        "Course Name: " + course_code_pattern + "\nalready exist.",
+                        "Duplication of Entry", JOptionPane.ERROR_MESSAGE);
+                Filter_Process.cancelFilter(course_table);
+                course_table.setRowSelectionInterval(table_row_selected, table_row_selected);
+                return false;
+            }
         }
 
         Filter_Process.cancelFilter(course_table);
