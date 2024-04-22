@@ -256,6 +256,10 @@ public class SSIS_Main_Display extends JFrame {
 
           column_names = new JComboBox<>(columns);
           column_names.setBounds(PADDING_WIDTH * 1, PADDING_HEIGHT * 3, 120, 30);
+          column_names.addActionListener(e -> {
+               if (column_names.getSelectedIndex() == 0)
+                    Filter_Process.cancelFilter(display_table);
+          });
 
           // setup the search field
           search_input = new JTextField("Search Here");

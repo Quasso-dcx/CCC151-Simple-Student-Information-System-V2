@@ -12,4 +12,5 @@
 > 2nd Year - BS Computer Science 
 
 # Reminders
-- 
+- The database query attached are just sample data for testing the app on other computers.
+- There was an activity after (date = 04/22/24), to get the queries, just visit: [Queries on Assignment 2 Part 2](https://drive.google.com/file/d/12htGdAYMnnqXN8428kT5afwsqjNRJaPb/view?usp=drive_link).
